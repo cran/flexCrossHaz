@@ -12,8 +12,8 @@ Estimation of Cox model with flexible time-varying effects via P-splines and pos
 \tabular{ll}{
 Package: \tab flexCrossHaz\cr
 Type: \tab Package\cr
-Version: \tab 0.1\cr
-Date: \tab 2010-03-04\cr
+Version: \tab 0.2\cr
+Date: \tab 2010-03-25\cr
 License: \tab GPL\cr
 }
 Given a covariate with a time-varying effect, the package \code{flexCrossHaz} allows to 
@@ -22,8 +22,10 @@ Given a covariate with a time-varying effect, the package \code{flexCrossHaz} al
   Several variables with time-varying effect are allowed.
 }
 \author{
-Vito M.R. Muggeo \email{vito.muggeo@unipa.it} and Miriam Tagliavia \email{tagliavia@dssm.unipa.it}
-% Maintainer: Who to complain to <yourfault@somewhere.net>
+Vito M.R. Muggeo \email{vito.muggeo@unipa.it}\cr
+Miriam Tagliavia \email{tagliavia@dssm.unipa.it}
+
+Maintainer: Miriam Tagliavia \email{tagliavia@dssm.unipa.it}
 }
 \references{
 Verweij, P. and van Houwelingen, H. (1995) Time-dependent effects of fixed 

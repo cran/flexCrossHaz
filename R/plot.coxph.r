@@ -1,4 +1,4 @@
-plot.coxph <- function (x, term, ...){
+plot.coxph <- function (x, term, add=FALSE,...){
   # x object returned by coxph
       if(missing(term)) {
           id<-1:length(coef(x))
@@ -20,8 +20,13 @@ plot.coxph <- function (x, term, ...){
       y<- drop(B%*%b)
       se<-sqrt(diag(B%*%x$var[id,id]%*%t(B)))
       M<-cbind(y-1.96*se,y,y+1.96*se)
+      if(!add) {
       ylab=if(missing(term)) "Log hazard ratio" else paste("Log hazard ratio for",term, "")
       matplot(xx, M, type="l", lty=c(2,1,2), lwd=2, xlab="Time",ylab=ylab, col=1,...)
       abline(h=0,lty=3)
- }
+        }
+        else{
+        lines(xx, M[,2], type="l", lty=1, lwd=2,...)
+        }
+}
  

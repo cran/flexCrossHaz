@@ -1,6 +1,15 @@
-psplineTime <-
-function (x, df = 4, theta, nterm = 2.5 * df, by.x, pen.diff=2, degree = 3, eps = 0.1, v, crs.point, Bs=FALSE, method, ...){
-
+psplineTime <-function (x, by.x, weights, crs.point, pen=c("L2","L1"), 
+  b.sign=c("unspecified","positive","negative"), monot=c("unspecified","increasing","decreasing"),
+    df = 4, theta, nterm = 2.5 * df, pen.diff=1, degree = 3, eps = 0.1, Bs=FALSE, method, ...){
+#aggiustare ?psplineTime (togliere x=T dagli esempi
+# una verifuca su length(weights)!=(nterm+degree)
+# una verifca quando b(t)=a+bI(t>psi)
+    segno.b<-match.arg(b.sign)
+    monot<-match.arg(monot)
+    pen<-match.arg(pen)
+    weights.yes<-pen=="L1" || segno.b!="unspecified" || monot!="unspecified"
+    if(weights.yes && missing(weights)) stop("weights required!")
+    if(weights.yes && length(weights)!=(nterm+degree)) stop("weights length and B-spline basis dimension don't match!")
     if (!missing(theta)) {
         method <- "fixed"
         if (theta <= 0 || theta >= 1)
@@ -28,7 +37,7 @@ function (x, df = 4, theta, nterm = 2.5 * df, by.x, pen.diff=2, degree = 3, eps 
     dx <- (rx[2] - rx[1])/nterm
     knots <- c(rx[1] + dx * ((-degree):(nterm - 1)), rx[2] +
         dx * (0:degree))
-    if (all(keepx)) 
+    if (all(keepx))
         newx <- if(Bs) bs(x,df = nterm, degree= degree, intercept=TRUE) else spline.des(knots, x, degree + 1)$design
     else {
         temp <- if(Bs) bs(x[keepx], df = nterm, degree = degree, intercept=TRUE) else spline.des(knots, x[keepx], degree + 1)$design
@@ -39,8 +48,20 @@ function (x, df = 4, theta, nterm = 2.5 * df, by.x, pen.diff=2, degree = 3, eps 
     class(newx) <- "coxph.penalty"
     nvar<-ncol(newx)
     dmat<-diff(diag(nvar),diff=pen.diff)
+     ##dmat<-apply(diag(nvar),2,diff,diff=pen.diff)    #io
+    if(pen=="L1"){
+     dmat<-diag(1/sqrt(abs(diff(weights,diff=pen.diff))+.00001))%*%dmat
+    }
     dmat<-crossprod(dmat)
-    if(!missing(v)) dmat<-dmat+diag(I(v<0))*10^{6}
+    if(monot!="unspecified"){
+      diff1.coef<- if(monot=="increasing") diff(weights,diff=1) else -diff(weights,diff=1)
+      dmat<-dmat+crossprod(I(diff1.coef<0)*diff(diag(nvar),diff=1))*10^{6}
+      }
+##   if(!missing(v)) dmat<-dmat+diag(I(v<0))*10^{6}
+    if(segno.b!="unspecified"){
+      v<- if(segno.b=="positive") weights else -weights
+      dmat<-dmat+diag(I(v<0))*10^{6}
+      }
     if(!missing(crs.point)){
         B0<-spline.des(knots, c(min(x),crs.point,max(x)), degree + 1)$design
         dmat<-dmat+tcrossprod(B0[2,])*10^{6}
@@ -85,14 +106,14 @@ function (x, df = 4, theta, nterm = 2.5 * df, by.x, pen.diff=2, degree = 3, eps 
                 done = TRUE))
     }
     else if (method == "df") {
-        frailty.controldf<-NULL    #the last
+        frailty.controldf<-NULL   
         temp <- list(pfun = pfun, printfun = printfun, diag = FALSE,
             cargs = ("df"), cparm = list(df = df, eps = eps,
                 thetas = c(1, 0), dfs = c(1, nterm), guess = 1 -
                   df/nterm, ...), pparm = dmat, varname = xnames,cfun = frailty.controldf)
     }
     else {
-    frailty.controlaic<-NULL   #the last
+    frailty.controlaic<-NULL   
         temp <- list(pfun = pfun, printfun = printfun, pparm = dmat,
             diag = FALSE, cargs = c("neff", "df", "plik"), cparm = list(eps = eps,
                 init = c(0.5, 0.95), lower = 0, upper = 1, ...),

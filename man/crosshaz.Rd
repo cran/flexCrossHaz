@@ -61,7 +61,7 @@ modify the increments in the crossing-point estimation, thus the updated estimat
 is given by \code{new.est<-old.est+k*increm}.
 
 The number of iterations is governed by \code{it.max} and each updated estimates 
-is returned if \code{display=TRUE}.
+is returned if \code{display= TRUE}.
 }
 \value{
 %%  ~Describe the value returned
@@ -81,7 +81,7 @@ is returned if \code{display=TRUE}.
   %\item{B}{the B-spline basis evaluated in 40 points within the range of the survival times }     
 }
 \references{
-Muggeo, V.M.R. and Tagliavia, M (2010) A flexible approach to the crossing 
+Muggeo, V.M.R. and Tagliavia, M. (2010) A flexible approach to the crossing 
 hazards problems. \emph{submitted} %\bold{xx}, xx--xx.
 }
 \author{
@@ -95,22 +95,22 @@ Vito M.R. Muggeo and Miriam Tagliavia
 \dontrun{
 %	or do  help(data=index)  for the standard data sets.
 data(gastric)
-# Test for a time varying effect for variable treat
-cox.zph(coxph(Surv(time,status) ~ treat, data=gastric))
+%# Test for a time varying effect for variable treat
+%cox.zph(coxph(Surv(time,status) ~ treat, data=gastric))
 
 # Create a new dataset in counting process format,
-#  with a start time, stop time, and event status for each record
 eventTime<-sort(with(gastric,unique(time[status==1])))
 gastric1<-survSplit(gastric, cut=eventTime, end="time", 
           event="status", start="start", id="id")
 gastric1$id<-as.integer(gastric1$id)
 gastric1<-gastric1[order(gastric1$id),]
  
-# Fit a Cox model with a smooth effect for treat
-# and compute the crossing point
-fit<-coxph(Surv(start,time,status) ~ psplineTime(start,theta=0.7,
-     pen.diff=1, nterm=15, by.x=treat), data=gastric1, x=TRUE) 
-cross.p<-crosshaz(fit,starting=300) 
+# Fit a Cox model with a smooth effect for treat..
+Fit1<-coxph(Surv(start,time,status) ~ psplineTime(start, by.x=treat,
+      theta=0.7, nterm=15), data=gastric1) 
+
+# .. and compute the crossing point
+cross.p<-crosshaz(Fit1,starting=300) 
 }
 }
 \keyword{ smooth }

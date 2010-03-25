@@ -40,7 +40,7 @@ Eilers, P.H.C. and Marx, B.D. (1996) Flexible smoothing with B-splines and penal
  \emph{Statistical Sciences} \bold{11}, 89--121.
 }
 \author{
- Vito M. R. Muggeo \email{vito.muggeo@unipa.it } 
+ Vito M. R. Muggeo (original code by P. Eilers) 
 }
 
 \examples{
